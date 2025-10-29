@@ -1,0 +1,6 @@
+co\edu\unicauca\fachadaServices\DTO\ReproduccionesDTOEntrada.class
+co\edu\unicauca\main\Main.class
+co\edu\unicauca\fachadaServices\services\ReproduccionService.class
+co\edu\unicauca\capaDeControladores\ReproduccionController.class
+co\edu\unicauca\fachadaServices\services\componenteComunicacionServidorReproducciones\ReproduccionesRemoteClient.class
+co\edu\unicauca\fachadaServices\services\componenteComunicacionServidorReproducciones\ComunicacionServidorReproducciones.class
