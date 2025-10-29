@@ -4,11 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Main {
+public class MainCalculoPreferencias {
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-        System.out.println("[ECO][Java] ServidorDeReproducciones iniciado correctamente en puerto 2020 ");
+        System.out.println("[ECO][Java] Servidor de Cálculo de Preferencias iniciado correctamente en puerto 2021");
+        SpringApplication.run(MainCalculoPreferencias.class, args);
     }
 }
-
-

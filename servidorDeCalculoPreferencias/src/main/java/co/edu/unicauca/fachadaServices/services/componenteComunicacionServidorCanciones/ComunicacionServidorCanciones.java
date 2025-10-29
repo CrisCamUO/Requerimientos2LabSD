@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ComunicacionServidorCanciones {
 
-  private static final String BASE_URL = "http://localhost:3000";
+  private static final String BASE_URL = "http://localhost:5051";
   private final CancionesRemoteClient client;
 
     public ComunicacionServidorCanciones(){
