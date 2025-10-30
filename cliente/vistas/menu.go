@@ -143,31 +143,32 @@ func buscarGeneroPorId(generos []*pbSong.Genero, id int32) *pbSong.Genero {
 }
 
 // explorarCancionesPorGenero - Explora las canciones de un género específico
-func explorarCancionesPorGenero(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, genero *pbSong.Genero) {
+// explorarCancionesPorGenero - Explora las canciones de un género específico
+func explorarCancionesPorGenero(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, genero *pbSong.Genero) bool {
 	fmt.Printf("\n📡 Buscando canciones del género '%s'...\n", genero.Nombre)
 
 	respuestaCanciones, err := clienteCanciones.ListarCancionesPorGenero(ctx, &pbSong.IdGenero{Id: genero.Id})
 	if err != nil {
 		fmt.Printf("❌ Error obteniendo canciones: %v\n", err)
 		presionarEnterParaContinuar()
-		return
+		return false
 	}
 
 	if len(respuestaCanciones.Canciones) == 0 {
 		fmt.Printf("😔 No se encontraron canciones para el género '%s'.\n", genero.Nombre)
 		presionarEnterParaContinuar()
-		return
+		return false
 	}
 
 	for {
 		mostrarCancionesDelGenero(respuestaCanciones.Canciones, genero.Nombre)
 
-		titulo := solicitarTituloCancion()
-		if titulo == "" { // Usuario eligió volver
-			return
+		cancionSeleccionada := solicitarCancionPorTituloOID(respuestaCanciones.Canciones)
+		if cancionSeleccionada == nil {
+			return false
 		}
 
-		buscarYReproducirCancion(clienteCanciones, clienteStreaming, ctx, titulo)
+		buscarYReproducirCancion(clienteCanciones, clienteStreaming, ctx, cancionSeleccionada)
 	}
 }
 
@@ -180,7 +181,43 @@ func mostrarCancionesDelGenero(canciones []*pbSong.Cancion, nombreGenero string)
 	for i, c := range canciones {
 		fmt.Printf("🎶 %d. %s - %s\n", i+1, c.Titulo, c.Artista)
 	}
-	fmt.Println("\n💡 Para reproducir una canción, escriba el título exacto.")
+	fmt.Println("\n💡 Para reproducir una canción, escriba el titulo exacto o el ID.")
+}
+
+// solicitarCancionPorTituloOID permite seleccionar una canción por número o título
+func solicitarCancionPorTituloOID(canciones []*pbSong.Cancion) *pbSong.Cancion {
+	for {
+		fmt.Print("\n📝 Ingrese el número o título de la canción (o 'volver' para regresar): ")
+
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("❌ Error leyendo entrada. Intente nuevamente.")
+			continue
+		}
+
+		input = strings.TrimSpace(input)
+		if strings.ToLower(input) == "volver" {
+			return nil
+		}
+
+		// Si ingresa número, buscar por índice
+		if num, err := strconv.Atoi(input); err == nil {
+			if num >= 1 && num <= len(canciones) {
+				return canciones[num-1]
+			}
+			fmt.Println("❌ Número fuera de rango. Intente nuevamente.")
+			continue
+		}
+
+		// Buscar por título
+		for _, c := range canciones {
+			if strings.EqualFold(c.Titulo, input) {
+				return c
+			}
+		}
+
+		fmt.Println("❌ No se encontró ninguna canción con ese número o título. Intente nuevamente.")
+	}
 }
 
 // solicitarTituloCancion - Solicita al usuario el título de la canción a reproducir
@@ -209,28 +246,73 @@ func solicitarTituloCancion() string {
 	}
 }
 
-// buscarYReproducirCancion - Busca una canción y ofrece reproducirla
-func buscarYReproducirCancion(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, titulo string) {
-	fmt.Printf("\n🔍 Buscando la canción '%s'...\n", titulo)
+// buscarYReproducirCancion - Busca una canción por título, número o reproduce directamente una canción seleccionada
+func buscarYReproducirCancion(
+	clienteCanciones pbSong.ServiciosCancionesClient,
+	clienteStreaming pbStream.AudioServiceClient,
+	ctx context.Context,
+	input interface{},
+	canciones ...[]*pbSong.Cancion,
+) {
+	var cancionSeleccionada *pbSong.Cancion
 
-	respuestaCancion, err := clienteCanciones.BuscarCancion(ctx, &pbSong.PeticionCancionDTO{Titulo: titulo})
-	if err != nil {
-		fmt.Printf("❌ Error buscando la canción: %v\n", err)
+	switch valor := input.(type) {
+
+	//Caso 1: Se pasa directamente la canción ya seleccionada
+	case *pbSong.Cancion:
+		cancionSeleccionada = valor
+
+	// Caso 2: Se pasa el nombre o el número como texto
+	case string:
+		fmt.Printf("\n🔍 Buscando la canción '%s'...\n", valor)
+
+		// Intentar interpretar como número (posición o ID)
+		if len(canciones) > 0 && canciones[0] != nil {
+			if num, err := strconv.Atoi(valor); err == nil {
+				for _, c := range canciones[0] {
+					if c.Id == int32(num) { // Comparación con el ID
+						cancionSeleccionada = c
+						break
+					}
+				}
+			}
+		}
+
+		// Si no se encontró en la lista, buscar por título remoto
+		if cancionSeleccionada == nil {
+			respuestaCancion, err := clienteCanciones.BuscarCancion(ctx, &pbSong.PeticionCancionDTO{Titulo: valor})
+			if err != nil {
+				fmt.Printf("❌ Error buscando la canción: %v\n", err)
+				presionarEnterParaContinuar()
+				return
+			}
+
+			if respuestaCancion.Codigo != 200 {
+				fmt.Printf("😔 La canción '%s' no fue encontrada.\n", valor)
+				fmt.Println("💡 Verifique que el título esté escrito exactamente como aparece en la lista.")
+				presionarEnterParaContinuar()
+				return
+			}
+
+			cancionSeleccionada = respuestaCancion.ObjCancion
+		}
+
+	default:
+		fmt.Println("❌ Tipo de dato no válido. Se esperaba texto o canción.")
 		presionarEnterParaContinuar()
 		return
 	}
 
-	if respuestaCancion.Codigo != 200 {
-		fmt.Printf("😔 La canción '%s' no fue encontrada.\n", titulo)
-		fmt.Println("💡 Verifique que el título esté escrito exactamente como aparece en la lista.")
+	// Si se encontró la cancion, mostrar detalles y preguntar si se reproduce
+	if cancionSeleccionada != nil {
+		mostrarDetallesCancion(cancionSeleccionada)
+
+		if confirmarReproduccion() {
+			reproducirCancion(clienteStreaming, ctx, cancionSeleccionada)
+		}
+	} else {
+		fmt.Println("❌ No se encontró ninguna canción con los datos proporcionados.")
 		presionarEnterParaContinuar()
-		return
-	}
-
-	mostrarDetallesCancion(respuestaCancion.ObjCancion)
-
-	if confirmarReproduccion() {
-		reproducirCancion(clienteStreaming, ctx, respuestaCancion.ObjCancion)
 	}
 }
 
@@ -271,11 +353,19 @@ func confirmarReproduccion() bool {
 	}
 }
 
-// reproducirCancion - Reproduce una canción usando streaming
+// reproducirCancion - Reproduce una canción usando streaming, con opción de detener con '1'
+// 1. Inicia la petición al servidor para enviar la canción.
+// 2. Lanza goroutines para decodificar, reproducir y escuchar teclado.
+// 3. Permite detener la canción con la tecla '1' o esperar a que termine.
 func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context.Context, cancion *pbSong.Cancion) {
 	fmt.Printf("\n🎵 Iniciando reproducción de '%s'...\n", cancion.Titulo)
 
-	stream, err := clienteStreaming.EnviarCancionMedianteStream(ctx, &pbStream.PeticionDTO{
+	// Contexto con cancelación para detener la transmisión
+	ctxCancel, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Solicita al servidor la canción en formato MP3 mediante streaming
+	stream, err := clienteStreaming.EnviarCancionMedianteStream(ctxCancel, &pbStream.PeticionDTO{
 		Id:      cancion.Id,
 		Formato: "mp3",
 	})
@@ -286,28 +376,52 @@ func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context
 	}
 
 	fmt.Println("🔊 Reproduciendo canción en vivo...")
-	fmt.Println("⏸️  Presione Ctrl+C para detener la reproducción")
+	fmt.Println("⏸️  Escriba '1' y presione Enter en cualquier momento para detener la reproducción.")
 
-	reader, writer := io.Pipe()
-	canalSincronizacion := make(chan struct{})
+	// Canal de comunicación entre la recepción y la reproducción de audio
+	audioReader, audioWriter := io.Pipe()
+	canalSincronizacion := make(chan struct{}) // Notifica fin de la canción
+	interrupcion := make(chan bool, 1)         // Señala si el usuario detuvo la reproducción
 
-	// Goroutine para recibir y escribir los fragmentos en el pipe
-	go util.DecodificarReproducir(reader, canalSincronizacion)
-	util.RecibirCancion(stream, writer, canalSincronizacion)
+	// Goroutine 1: Decodifica y reproduce el audio recibido
+	go util.DecodificarReproducir(audioReader, canalSincronizacion)
 
-	for {
-		_, err := stream.Recv()
-		if err == io.EOF {
-			fmt.Println("\n✅ Reproducción finalizada.")
-			break
+	// Goroutine 2: Escucha entrada del teclado para detener
+	go func() {
+		stdinReader := bufio.NewReader(os.Stdin)
+		for {
+			fmt.Print(">>> ")
+			input, err := stdinReader.ReadString('\n')
+			if err != nil {
+				return
+			}
+			if strings.TrimSpace(input) == "1" {
+				interrupcion <- true
+				return
+			}
 		}
-		if err != nil {
-			fmt.Printf("\n❌ Error durante la reproducción: %v\n", err)
-			break
-		}
+	}()
+
+	// Goroutine 3: Recibe los fragmentos de audio desde el servidor
+	go func() {
+		util.RecibirCancion(stream, audioWriter, canalSincronizacion)
+	}()
+
+	// Esperar eventos: interrupción del usuario o finalización de la canción
+	select {
+	case <-interrupcion:
+		fmt.Println("\n  Reproducción detenida por el usuario.")
+		cancel()
+		audioReader.Close()
+		audioWriter.Close()
+		presionarEnterParaContinuar()
+		return
+
+	case <-canalSincronizacion:
+		fmt.Println("\n✅ Reproducción finalizada.")
+		presionarEnterParaContinuar()
+		return
 	}
-
-	presionarEnterParaContinuar()
 }
 
 // presionarEnterParaContinuar - Pausa la ejecución hasta que el usuario presione Enter
