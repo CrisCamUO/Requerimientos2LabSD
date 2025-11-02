@@ -7,6 +7,10 @@ import feign.jackson.JacksonDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+
+@Component
 public class ComunicacionServidorCanciones {
 
   private static final String BASE_URL = "http://localhost:5051";
