@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+
 	pbStream "servidor.local/grpc-servidor/serviciosStreaming"
 	pbSong "servidor.local/grpc-servidorCancion/serviciosCancion"
 
@@ -18,7 +19,7 @@ import (
 var reader = bufio.NewReader(os.Stdin)
 
 // MostrarMenuPrincipal - Punto de entrada principal del menú
-func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context) {
+func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, nickname string, idUsuario int) {
 	for {
 		opcion := mostrarMenuPrincipalYObtenerOpcion()
 
@@ -26,6 +27,8 @@ func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clie
 		case 1:
 			explorarGeneros(clienteCanciones, clienteStreaming, ctx)
 		case 2:
+			util.VerPreferencias(idUsuario)
+		case 3:
 			fmt.Println("\n🎵 ¡Gracias por usar nuestro reproductor de música! ¡Hasta luego! 🎵")
 			return
 		default:

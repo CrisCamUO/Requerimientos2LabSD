@@ -1,15 +1,17 @@
 package utilidades
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
-	pb "servidor.local/grpc-servidor/serviciosStreaming" 
+	pb "servidor.local/grpc-servidor/serviciosStreaming"
 )
 
 func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) {
@@ -49,4 +51,17 @@ func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, wr
 	// Esperar hasta que termine la reproducción
 	<-canalSincronizacion
 	fmt.Println("Reproducción finalizada.")
+}
+
+func VerPreferencias(userID int) {
+	url := fmt.Sprintf("http://localhost:2021/preferencias/calcular?idUsuario=%d", userID)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(nil))
+	if err != nil {
+		fmt.Printf("Error llamando al servidor de preferencias: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println("\nPreferencias recibidas:")
+	fmt.Println(string(body))
 }

@@ -8,12 +8,21 @@ import (
 	pbStream "servidor.local/grpc-servidor/serviciosStreaming"    // CORRECTO
 	pbSong "servidor.local/grpc-servidorCancion/serviciosCancion" // CORRECTO
 
+	util "cliente.local/grpc-cliente/utilidades"
 	menu "cliente.local/grpc-cliente/vistas"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+
+	// Iniciar sesión
+
+	nickname, idUsuario := util.IniciarSesion()
+	if nickname == "" {
+		log.Fatalln("No se pudo iniciar sesión. Saliendo...")
+	}
+
 	// Conexión al Servidor de Canciones (puerto 50051)
 	connSong, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -37,5 +46,5 @@ func main() {
 	defer cancel()
 
 	// Mostrar menu principal
-	menu.MostrarMenuPrincipal(clienteCanciones, clienteStreaming, ctx)
+	menu.MostrarMenuPrincipal(clienteCanciones, clienteStreaming, ctx, nickname, idUsuario)
 }
