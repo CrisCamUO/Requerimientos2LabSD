@@ -330,6 +330,7 @@ func mostrarDetallesCancion(cancion *pbSong.Cancion) {
 	fmt.Printf("📅 Año: %d\n", cancion.AnioLanzamiento)
 	fmt.Printf("⏱️  Duración: %s\n", cancion.Duracion)
 	fmt.Printf("🎸 Género: %s\n", cancion.ObjGenero.Nombre)
+	fmt.Printf("🗣️  Idioma: %s\n", cancion.Idioma)
 	fmt.Println(strings.Repeat("=", 45))
 }
 

@@ -36,6 +36,7 @@ func (thisF *FachadaAlmacenamiento) GuardarCancion(objCancion dtos.CancionAlmace
 		Titulo:  objCancion.Titulo,
 		Genero:  objCancion.Genero,
 		Artista: objCancion.Artista,
+		Idioma:  objCancion.Idioma,
 		Mensaje: "Nueva cancion almacenada: " + objCancion.Titulo + " de " + objCancion.Artista,
 	})
 	// Guardar archivo y registro en memoria

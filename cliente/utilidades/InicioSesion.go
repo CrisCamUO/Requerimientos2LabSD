@@ -20,7 +20,7 @@ type Usuario struct {
 var usuarios = []Usuario{
 	{Id: 1, Nickname: "tati", Password: "1234"},
 	{Id: 2, Nickname: "juan", Password: "abcd"},
-	{Id: 3, Nickname: "dani", Password: "pass"},
+	{Id: 3, Nickname: "cris", Password: "1234"},
 }
 
 // IniciarSesion muestra prompts y devuelve el nickname y el id del usuario autenticado.

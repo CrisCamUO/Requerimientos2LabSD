@@ -80,6 +80,7 @@ func ObtenerCancionesParaREST() []map[string]interface{} {
 			"anioLanzamiento": c.AnioLanzamiento,
 			"duracion":        c.Duracion,
 			"genero":          c.Genero.Nombre,
+			"idioma":		   c.Idioma,
 		})
 	}
 	return lista

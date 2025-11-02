@@ -52,6 +52,7 @@ message Cancion {
   int32 anio_lanzamiento = 4;
   string duracion = 5;
   Genero obj_genero = 6;
+  string idioma = 7;
 }
 
 message ListaCanciones {

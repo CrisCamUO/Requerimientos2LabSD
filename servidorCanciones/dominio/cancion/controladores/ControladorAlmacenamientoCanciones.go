@@ -41,6 +41,7 @@ func (thisC *ControladorAlmacenamientoCanciones) AlmacenarAudioCancion(w http.Re
 		Titulo:  r.FormValue("titulo"),
 		Genero:  r.FormValue("genero"),
 		Artista: r.FormValue("artista"),
+		Idioma:  r.FormValue("idioma"),
 	}
 
 	thisC.fachada.GuardarCancion(dto, data)

@@ -11,4 +11,5 @@ type Cancion struct {
 	AnioLanzamiento int32
 	Duracion       string
 	Genero         modelo.Genero
+	Idioma		   string
 }

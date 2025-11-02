@@ -19,6 +19,7 @@ type NotificacionCancion struct {
 	Artista string `json:"artista"`
 	Genero  string `json:"genero"`
 	Mensaje string `json:"mensaje"`
+	Idioma  string `json:"idioma"`
 }
 
 // Crear conexión a RabbitMQ
