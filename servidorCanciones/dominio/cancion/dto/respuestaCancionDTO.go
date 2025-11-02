@@ -11,6 +11,7 @@ type RespuestaDTO struct {
 	Mensaje    string
 }
 
+
 // ToPbCancion convierte un modelo interno de Cancion a un mensaje Protobuf
 // para ser enviado via gRPC al cliente. Realiza el mapeo entre las estructuras
 // del dominio y las estructuras de transporte.

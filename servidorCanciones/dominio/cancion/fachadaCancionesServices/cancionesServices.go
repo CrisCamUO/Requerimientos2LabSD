@@ -67,3 +67,20 @@ func ObtenerDetalleCancion(id int32) (*pb.DetalleCancion, error) {
 	}
 	return &pb.DetalleCancion{}, nil
 }
+
+// ObtenerCancionesParaREST devuelve todas las canciones en un formato adecuado para REST (JSON)
+func ObtenerCancionesParaREST() []map[string]interface{} {
+	var lista []map[string]interface{}
+
+	for _, c := range repositorio.VectorCanciones {
+		lista = append(lista, map[string]interface{}{
+			"id":              c.Id,
+			"titulo":          c.Titulo,
+			"autor":           c.Autor,
+			"anioLanzamiento": c.AnioLanzamiento,
+			"duracion":        c.Duracion,
+			"genero":          c.Genero.Nombre,
+		})
+	}
+	return lista
+}

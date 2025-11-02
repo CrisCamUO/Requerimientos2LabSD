@@ -44,8 +44,9 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 		fmt.Println("🎵 REPRODUCTOR DE MÚSICA - MENÚ PRINCIPAL 🎵")
 		fmt.Println(strings.Repeat("=", 50))
 		fmt.Println("1. 🎸 Explorar géneros musicales")
-		fmt.Println("2. 🚪 Salir")
-		fmt.Print("\n📝 Seleccione una opción (1-2): ")
+		fmt.Println("2. 📊 Ver recomendaciones de preferencias")
+		fmt.Println("3. 🚪 Salir")
+		fmt.Print("\n📝 Seleccione una opción (1-3): ")
 
 		input, err := reader.ReadString('\n')
 		if err != nil {
