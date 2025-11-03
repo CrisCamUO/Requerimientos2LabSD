@@ -20,7 +20,7 @@ func NuevoControladorAlmacenamientoCanciones() *ControladorAlmacenamientoCancion
 	}
 }
 
-func (thisC *ControladorAlmacenamientoCanciones) AlmacenarAudioCancion(w http.ResponseWriter, r *http.Request) {
+func (thisC *ControladorAlmacenamientoCanciones) AlmacenarCancion(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Almacenando canción...\n")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)

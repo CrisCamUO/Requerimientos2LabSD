@@ -34,7 +34,9 @@ func main() {
 func iniciarSevidorREST() {
 	ctrl := capaControladoresCancion.NuevoControladorAlmacenamientoCanciones()
 
-	http.HandleFunc("/canciones/almacenamiento", ctrl.AlmacenarAudioCancion)
+	http.HandleFunc("/canciones/almacenamiento", ctrl.AlmacenarCancion)
+	// TODO: registrar el handler de metadatos cuando se implemente, por ejemplo:
+	// http.HandleFunc("/canciones/metadatos", ctrl.GuardarMetadatosCancion)
 
 	fmt.Println("✅ Servicio de Tendencias escuchando en el puerto 5000...")
 	if err := http.ListenAndServe(":5000", nil); err != nil {

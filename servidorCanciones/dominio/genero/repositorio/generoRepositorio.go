@@ -9,6 +9,9 @@ var VectorGeneros = []genero.Genero{
 	{Id: 1, Nombre: "Salsa"},
 	{Id: 2, Nombre: "Cumbia"},
 	{Id: 3, Nombre: "Rock"},
+	{Id: 4, Nombre: "Pop"},
+	{Id: 5, Nombre: "Metal"},
+	{Id: 6, Nombre: "Jazz"},
 }
 
 // BuscarGenero busca un género por ID
@@ -30,4 +33,19 @@ func BuscarGenero(id int32) dto.RespuestaDTO {
 // BuscarTodosLosGeneros devuelve todos los géneros
 func BuscarTodosLosGeneros() []genero.Genero {
 	return VectorGeneros
+}
+
+func BuscarGeneroNombre(nombre string) dto.RespuestaDTO {
+	var respuesta dto.RespuestaDTO
+	for i := 0; i < len(VectorGeneros); i++ {
+		if VectorGeneros[i].Nombre == nombre {
+			respuesta.ObjGenero = VectorGeneros[i]
+			respuesta.Codigo = 200
+			respuesta.Mensaje = "Genereo encontrado correctamente"
+			return respuesta
+		}
+	}
+	respuesta.Codigo = 404
+	respuesta.Mensaje = "El genero " + nombre + " no fue encontrado"
+	return respuesta
 }

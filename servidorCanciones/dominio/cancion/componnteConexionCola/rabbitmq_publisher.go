@@ -15,11 +15,13 @@ type RabbitPublisher struct {
 
 // Estructura del mensaje que enviará a RabbitMQ
 type NotificacionCancion struct {
-	Titulo  string `json:"titulo"`
-	Artista string `json:"artista"`
-	Genero  string `json:"genero"`
-	Mensaje string `json:"mensaje"`
-	Idioma  string `json:"idioma"`
+	Titulo          string `json:"titulo"`
+	Artista         string `json:"artista"`
+	Genero          string `json:"genero"`
+	Mensaje         string `json:"mensaje"`
+	Idioma          string `json:"idioma"`
+	AnioLanzamiento int32  `json:"anio_lanzamiento"`
+	Duracion        string `json:"duracion"`
 }
 
 // Crear conexión a RabbitMQ
