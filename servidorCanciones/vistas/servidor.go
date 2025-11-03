@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 
 	"google.golang.org/grpc"
 	capaControladoresCancion "servidor.local/grpc-servidorCancion/dominio/cancion/controladores"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+
+	go iniciarSevidorREST()
 
 	port := ":50051"
 	lis, err := net.Listen("tcp", port)
@@ -24,5 +27,17 @@ func main() {
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Error al servir: %v", err)
+	}
+
+}
+
+func iniciarSevidorREST() {
+	ctrl := capaControladoresCancion.NuevoControladorAlmacenamientoCanciones()
+
+	http.HandleFunc("/canciones/almacenamiento", ctrl.AlmacenarAudioCancion)
+
+	fmt.Println("✅ Servicio de Tendencias escuchando en el puerto 5000...")
+	if err := http.ListenAndServe(":5000", nil); err != nil {
+		fmt.Println("Error iniciando el servidor:", err)
 	}
 }
