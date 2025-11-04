@@ -34,12 +34,14 @@ func main() {
 func iniciarSevidorREST() {
 	ctrl := capaControladoresCancion.NuevoControladorAlmacenamientoCanciones()
 
+	// Endpoint para almacenar canciones
 	http.HandleFunc("/canciones/almacenamiento", ctrl.AlmacenarCancion)
-	// TODO: registrar el handler de metadatos cuando se implemente, por ejemplo:
-	// http.HandleFunc("/canciones/metadatos", ctrl.GuardarMetadatosCancion)
 
-	fmt.Println("✅ Servicio de Tendencias escuchando en el puerto 5000...")
+	// Endpoint para listar los metadatos de las canciones
+	http.HandleFunc("/canciones/metadatos", capaControladoresCancion.ListarCancionesREST)
+
+	fmt.Println(" Servicio de Tendencias escuchando en el puerto 5000...")
 	if err := http.ListenAndServe(":5000", nil); err != nil {
-		fmt.Println("Error iniciando el servidor:", err)
+		fmt.Println("Error iniciando el servidor REST:", err)
 	}
 }
