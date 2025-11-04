@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-
 	pbStream "servidor.local/grpc-servidor/serviciosStreaming"
 	pbSong "servidor.local/grpc-servidorCancion/serviciosCancion"
 
@@ -61,11 +60,11 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 			continue
 		}
 
-		if opcion >= 1 && opcion <= 2 {
+		if opcion >= 1 && opcion <= 3 {
 			return opcion
 		}
 
-		fmt.Println("❌ Opción fuera de rango. Seleccione 1 o 2.")
+		fmt.Println("❌ Opción fuera de rango. Seleccione 1, 2 o 3.")
 	}
 }
 
@@ -409,7 +408,7 @@ func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context
 
 	// Goroutine 3: Recibe los fragmentos de audio desde el servidor
 	go func() {
-		util.RecibirCancion(stream, audioWriter, canalSincronizacion)
+		util.RecibirCancion(stream, audioWriter, canalSincronizacion, int(cancion.Id), int(cancion.Id))
 	}()
 
 	// Esperar eventos: interrupción del usuario o finalización de la canción

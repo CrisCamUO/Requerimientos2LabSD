@@ -28,7 +28,7 @@ func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) 
 	})))
 }
 
-func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalSincronizacion chan struct{}) {
+func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalSincronizacion chan struct{}, idUsuario int, idCancion int) {
 	noFragmento := 0
 	for {
 		fragmento, err := stream.Recv()
@@ -51,6 +51,9 @@ func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, wr
 	// Esperar hasta que termine la reproducción
 	<-canalSincronizacion
 	fmt.Println("Reproducción finalizada.")
+
+	//registrar la reproduccion
+	RegistrarReproduccion(idUsuario, idCancion)
 }
 
 func VerPreferencias(userID int) {
@@ -64,4 +67,20 @@ func VerPreferencias(userID int) {
 	body, _ := io.ReadAll(resp.Body)
 	fmt.Println("\nPreferencias recibidas:")
 	fmt.Println(string(body))
+}
+
+func RegistrarReproduccion(userId, songId int) {
+	url := "http://localhost:2020/reproducciones"
+	
+	jsonData := fmt.Sprintf(`{"userId": "%d", "songId": "%d", "fechaHora": "%s"}`,
+		userId, songId, time.Now().Format("2006-01-02 15:04:05"))
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(jsonData)))
+	if err != nil {
+		fmt.Println("Error al registrar reproducción:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("Reproducción registrada correctamente en el servidor de reproducciones.")
 }
