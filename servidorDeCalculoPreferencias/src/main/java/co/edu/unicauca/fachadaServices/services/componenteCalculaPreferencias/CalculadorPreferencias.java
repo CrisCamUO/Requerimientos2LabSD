@@ -29,7 +29,7 @@ public class CalculadorPreferencias {
         Map<String, Integer> contadorArtistas = new HashMap<>();
 
         for (ReproduccionesDTOEntrada r : reproducciones) {
-            Integer idCancion = r.getIdCancion();
+            String idCancion = r.getSongId();
             if (idCancion == null) continue;
 
             CancionDTOEntrada c = mapaCanciones.get(idCancion);

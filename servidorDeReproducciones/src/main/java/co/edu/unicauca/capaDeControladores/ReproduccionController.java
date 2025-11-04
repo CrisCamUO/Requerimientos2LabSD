@@ -17,6 +17,8 @@ public class ReproduccionController {
     public ResponseEntity<String> registrar(@RequestBody ReproduccionesDTOEntrada dto) {
         System.out.println("[ECO][Java] Reproducción recibida -> Usuario: " 
             + dto.getUserId() + " | Canción: " + dto.getSongId() + " | Fecha y Hora: " + dto.getFechaHora());
+        
+        service.registrar(dto);
         return ResponseEntity.ok("Reproducción registrada correctamente");
     }
 }

@@ -25,6 +25,7 @@ type PeticionDTO struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Formato       string                 `protobuf:"bytes,2,opt,name=formato,proto3" json:"formato,omitempty"`
+	IdUsuario     int32                  `protobuf:"varint,3,opt,name=idUsuario,proto3" json:"idUsuario,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -71,6 +72,13 @@ func (x *PeticionDTO) GetFormato() string {
 		return x.Formato
 	}
 	return ""
+}
+
+func (x *PeticionDTO) GetIdUsuario() int32 {
+	if x != nil {
+		return x.IdUsuario
+	}
+	return 0
 }
 
 type FragmentoCancion struct {
@@ -121,10 +129,11 @@ var File_servicios_proto protoreflect.FileDescriptor
 
 const file_servicios_proto_rawDesc = "" +
 	"\n" +
-	"\x0fservicios.proto\x12\tservicios\"7\n" +
+	"\x0fservicios.proto\x12\tservicios\"U\n" +
 	"\vpeticionDTO\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x18\n" +
-	"\aformato\x18\x02 \x01(\tR\aformato\"&\n" +
+	"\aformato\x18\x02 \x01(\tR\aformato\x12\x1c\n" +
+	"\tidUsuario\x18\x03 \x01(\x05R\tidUsuario\"&\n" +
 	"\x10fragmentoCancion\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data2d\n" +
 	"\fAudioService\x12T\n" +

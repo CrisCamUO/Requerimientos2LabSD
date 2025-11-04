@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class ReproduccionesDTOEntrada {
-   private Integer idUsuario;
-   private Integer idCancion;
-   
+   private String userId;
+    private String songId;
+    private String fechaHora;
 }
 
 

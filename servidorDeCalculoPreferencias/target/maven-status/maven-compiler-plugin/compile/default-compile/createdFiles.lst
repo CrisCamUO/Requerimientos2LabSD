@@ -14,4 +14,5 @@ co\edu\unicauca\fachadaServices\services\componenteComunicacionServidorCanciones
 co\edu\unicauca\capaDeControladores\ControladorPreferenciasUsuariosInt.class
 co\edu\unicauca\configuracion\lector\LectorPropiedadesConfig.class
 co\edu\unicauca\fachadaServices\DTO\PreferenciaGeneroDTORespuesta.class
+co\edu\unicauca\capaDeControladores\ControladorPreferenciasRest.class
 co\edu\unicauca\fachadaServices\services\componenteComunicacionServidorReproducciones\ComunicacionServidorReproducciones.class

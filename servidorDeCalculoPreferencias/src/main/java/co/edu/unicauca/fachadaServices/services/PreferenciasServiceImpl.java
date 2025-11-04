@@ -1,6 +1,7 @@
 
 package co.edu.unicauca.fachadaServices.services;
 
+import org.springframework.stereotype.Service;
 import java.util.List;
 
 import co.edu.unicauca.fachadaServices.DTO.CancionDTOEntrada;
@@ -10,6 +11,7 @@ import co.edu.unicauca.fachadaServices.services.componenteCalculaPreferencias.Ca
 import co.edu.unicauca.fachadaServices.services.componenteComunicacionServidorCanciones.ComunicacionServidorCanciones;
 import co.edu.unicauca.fachadaServices.services.componenteComunicacionServidorReproducciones.ComunicacionServidorReproducciones;
 
+@Service
 public class PreferenciasServiceImpl implements IPreferenciasService {
 	
 	private ComunicacionServidorCanciones comunicacionServidorCanciones;
@@ -37,7 +39,7 @@ public class PreferenciasServiceImpl implements IPreferenciasService {
 		List<ReproduccionesDTOEntrada> reproduccionesUsuario = this.comunicacionServidorReproducciones.obtenerReproduccionesRemotas(id);
 		System.out.println("Reproducciones obtenidas del servidor de reproducciones para el usuario  " + id);
 		for (ReproduccionesDTOEntrada reproduccion : reproduccionesUsuario){
-			System.out.println(reproduccion.getIdUsuario() + " " + reproduccion.getIdCancion());
+			System.out.println(reproduccion.getUserId() + " " + reproduccion.getSongId());
 		}
 	
 		return this.calculadorPreferencias.calcular(id, objCanciones, reproduccionesUsuario);

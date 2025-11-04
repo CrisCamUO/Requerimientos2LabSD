@@ -1,6 +1,3 @@
-
-
-
 syntax = "proto3";
 
 package servicios;
@@ -14,6 +11,7 @@ service AudioService {
 message peticionDTO {
   int32 id = 1; 
   string formato = 2;
+  int32 idUsuario = 3; 
 }
 
 message fragmentoCancion {
