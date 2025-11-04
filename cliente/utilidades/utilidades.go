@@ -2,6 +2,7 @@ package utilidades
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -52,6 +53,9 @@ func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, wr
 	<-canalSincronizacion
 	fmt.Println("Reproducción finalizada.")
 
+	// Cerrar el writer aquí, no dentro del bucle
+	writer.Close()
+
 	//registrar la reproduccion
 	RegistrarReproduccion(idUsuario, idCancion)
 }
@@ -69,18 +73,33 @@ func VerPreferencias(userID int) {
 	fmt.Println(string(body))
 }
 
-func RegistrarReproduccion(userId, songId int) {
+func RegistrarReproduccion(idUsuario int, idCancion int) {
 	url := "http://localhost:2020/reproducciones"
-	
-	jsonData := fmt.Sprintf(`{"userId": "%d", "songId": "%d", "fechaHora": "%s"}`,
-		userId, songId, time.Now().Format("2006-01-02 15:04:05"))
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(jsonData)))
+	// Crear la estructura de la reproducción
+	reproduccion := map[string]interface{}{
+		"userId":    fmt.Sprintf("%d", idUsuario),
+		"songId":    fmt.Sprintf("%d", idCancion),
+		"fechaHora": time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	// Convertir el mapa a JSON
+	body, err := json.Marshal(reproduccion)
 	if err != nil {
-		fmt.Println("Error al registrar reproducción:", err)
+		log.Printf("Error convirtiendo a JSON: %v", err)
+		return
+	}
+
+	// Enviar al servidor de reproducciones
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		log.Printf("Error enviando la reproducción: %v", err)
 		return
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("Reproducción registrada correctamente en el servidor de reproducciones.")
+	// Leer respuesta
+	respuesta, _ := io.ReadAll(resp.Body)
+	fmt.Println("\nReproducción registrada correctamente en el servidor de reproducciones.")
+	fmt.Println(string(respuesta))
 }
