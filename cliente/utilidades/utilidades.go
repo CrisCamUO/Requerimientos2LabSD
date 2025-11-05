@@ -29,7 +29,7 @@ func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) 
 	})))
 }
 
-func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalSincronizacion chan struct{}, idUsuario int, idCancion int) {
+func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalSincronizacion chan struct{}, idUsuario string, idCancion string) {
 	noFragmento := 0
 	for {
 		fragmento, err := stream.Recv()
@@ -60,8 +60,8 @@ func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, wr
 	RegistrarReproduccion(idUsuario, idCancion)
 }
 
-func VerPreferencias(userID int) {
-	url := fmt.Sprintf("http://localhost:2021/preferencias/calcular?idUsuario=%d", userID)
+func VerPreferencias(userID string) {
+	url := fmt.Sprintf("http://localhost:2021/preferencias/calcular?idUsuario=%s", userID)
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(nil))
 	if err != nil {
 		fmt.Printf("Error llamando al servidor de preferencias: %v\n", err)
@@ -73,33 +73,25 @@ func VerPreferencias(userID int) {
 	fmt.Println(string(body))
 }
 
-func RegistrarReproduccion(idUsuario int, idCancion int) {
+func RegistrarReproduccion(idUsuario string, idCancion string) {
 	url := "http://localhost:2020/reproducciones"
 
 	// Crear la estructura de la reproducción
 	reproduccion := map[string]interface{}{
-		"userId":    fmt.Sprintf("%d", idUsuario),
-		"songId":    fmt.Sprintf("%d", idCancion),
+		"userId":    idUsuario,
+		"songId":    idCancion,
 		"fechaHora": time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	// Convertir el mapa a JSON
-	body, err := json.Marshal(reproduccion)
-	if err != nil {
-		log.Printf("Error convirtiendo a JSON: %v", err)
-		return
-	}
+	jsonData, _ := json.Marshal(reproduccion)
 
-	// Enviar al servidor de reproducciones
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
-	if err != nil {
-		log.Printf("Error enviando la reproducción: %v", err)
-		return
-	}
-	defer resp.Body.Close()
+    resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        fmt.Printf("Error enviando reproducción: %v\n", err)
+        return
+    }
+    defer resp.Body.Close()
 
-	// Leer respuesta
-	respuesta, _ := io.ReadAll(resp.Body)
-	fmt.Println("\nReproducción registrada correctamente en el servidor de reproducciones.")
-	fmt.Println(string(respuesta))
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(body))
 }

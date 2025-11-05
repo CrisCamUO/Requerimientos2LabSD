@@ -11,28 +11,28 @@ import (
 
 // Usuario representa un usuario simple en memoria
 type Usuario struct {
-	Id       int
+	Id       string
 	Nickname string
 	Password string // en claro para la práctica, en producción hash
 }
 
 // Mapa de usuarios (simulado). Cambia o agrega según necesites.
 var usuarios = []Usuario{
-	{Id: 1, Nickname: "tati", Password: "1234"},
-	{Id: 2, Nickname: "juan", Password: "abcd"},
-	{Id: 3, Nickname: "cris", Password: "1234"},
+	{Id: "1", Nickname: "tati", Password: "1234"},
+	{Id: "2", Nickname: "juan", Password: "abcd"},
+	{Id: "3", Nickname: "cris", Password: "1234"},
 }
 
 // IniciarSesion muestra prompts y devuelve el nickname y el id del usuario autenticado.
 // Si falla devuelve ("", 0).
-func IniciarSesion() (string, int) {
+func IniciarSesion() (string, string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print("👤 Nickname: ")
 	nickRaw, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println("❌ Error leyendo nickname:", err)
-		return "", 0
+		return "", " "
 	}
 	nick := strings.TrimSpace(nickRaw)
 
@@ -58,5 +58,5 @@ func IniciarSesion() (string, int) {
 	}
 
 	fmt.Println("❌ Credenciales inválidas.")
-	return "", 0
+	return "", ""
 }

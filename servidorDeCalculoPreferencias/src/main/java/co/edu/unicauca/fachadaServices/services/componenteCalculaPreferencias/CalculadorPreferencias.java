@@ -17,62 +17,69 @@ public class CalculadorPreferencias {
 
     
     public PreferenciasDTORespuesta calcular(Integer idUsuario,
-                                              List<CancionDTOEntrada> canciones,
-                                              List<ReproduccionesDTOEntrada> reproducciones) {
+                                            List<CancionDTOEntrada> canciones,
+                                             List<ReproduccionesDTOEntrada> reproducciones) {
+
+        // Crear mapa de canciones por ID (para acceder rápido)
         Map<Integer, CancionDTOEntrada> mapaCanciones = canciones.stream()
             .filter(Objects::nonNull)
             .filter(c -> c.getId() != null)
-            .collect(Collectors.toMap(CancionDTOEntrada::getId, c -> c, (a,b) -> a));
-       
-        
+            .collect(Collectors.toMap(CancionDTOEntrada::getId, c -> c, (a, b) -> a));
+
+        // Contadores de generos y artistas
         Map<String, Integer> contadorGeneros = new HashMap<>();
         Map<String, Integer> contadorArtistas = new HashMap<>();
 
+        System.out.println("Iniciando calculo de preferencias...");
+
+        // Recorrer las reproducciones del usuario
         for (ReproduccionesDTOEntrada r : reproducciones) {
-            String idCancion = r.getSongId();
-            if (idCancion == null) continue;
+            if (r.getSongId() == null) continue;
 
-            CancionDTOEntrada c = mapaCanciones.get(idCancion);
-            if (c == null) {               
-                continue;
+            try {
+                Integer idCancionInt = Integer.parseInt(r.getSongId());
+                CancionDTOEntrada c = mapaCanciones.get(idCancionInt);
+
+                if (c == null) {
+                    System.out.println("No se encontró la cancion con ID " + idCancionInt);
+                    continue;
+                }
+
+                String genero = c.getGenero() == null ? "Desconocido" : c.getGenero();
+                String artista = c.getArtista() == null ? "Desconocido" : c.getArtista();
+
+                contadorGeneros.put(genero, contadorGeneros.getOrDefault(genero, 0) + 1);
+                contadorArtistas.put(artista, contadorArtistas.getOrDefault(artista, 0) + 1);
+
+                System.out.println(" Procesada reproducción -> " + artista + " / " + genero);
+
+            } catch (NumberFormatException e) {
+                System.out.println("ID de cancion invalido: " + r.getSongId());
             }
-
-            String genero = c.getGenero() == null ? "Desconocido" : c.getGenero();
-            String artista = c.getArtista() == null ? "Desconocido" : c.getArtista();
-
-            contadorGeneros.put(genero, contadorGeneros.getOrDefault(genero, 0) + 1);
-            contadorArtistas.put(artista, contadorArtistas.getOrDefault(artista, 0) + 1);
         }
 
+        // Convertir los contadores a listas ordenadas
         
         List<PreferenciaGeneroDTORespuesta> preferenciasGeneros = contadorGeneros.entrySet().stream()
-            .map(e -> {
-                PreferenciaGeneroDTORespuesta dto = new PreferenciaGeneroDTORespuesta();
-                dto.setNombreGenero(e.getKey());
-                dto.setNumeroPreferencias(e.getValue());
-                return dto;
-            })
+            .map(e -> new PreferenciaGeneroDTORespuesta(e.getKey(), e.getValue()))
             .sorted(Comparator.comparingInt(PreferenciaGeneroDTORespuesta::getNumeroPreferencias).reversed()
                     .thenComparing(PreferenciaGeneroDTORespuesta::getNombreGenero))
             .collect(Collectors.toList());
 
         List<PreferenciaArtistaDTORespuesta> preferenciasArtistas = contadorArtistas.entrySet().stream()
-            .map(e -> {
-                PreferenciaArtistaDTORespuesta dto = new PreferenciaArtistaDTORespuesta();
-                dto.setNombreArtista(e.getKey());
-                dto.setNumeroPreferencias(e.getValue());
-                return dto;
-            })
+            .map(e -> new PreferenciaArtistaDTORespuesta(e.getKey(), e.getValue()))
             .sorted(Comparator.comparingInt(PreferenciaArtistaDTORespuesta::getNumeroPreferencias).reversed()
                     .thenComparing(PreferenciaArtistaDTORespuesta::getNombreArtista))
             .collect(Collectors.toList());
 
-        
+        // Armar el DTO final
+
         PreferenciasDTORespuesta respuesta = new PreferenciasDTORespuesta();
         respuesta.setIdUsuario(idUsuario);
         respuesta.setPreferenciasGeneros(preferenciasGeneros);
         respuesta.setPreferenciasArtistas(preferenciasArtistas);
 
-        return respuesta; 
+        System.out.println(" Cálculo de preferencias completado.");
+        return respuesta;
     }
 }

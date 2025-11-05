@@ -18,13 +18,13 @@ import (
 var reader = bufio.NewReader(os.Stdin)
 
 // MostrarMenuPrincipal - Punto de entrada principal del menú
-func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, nickname string, idUsuario int) {
+func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, nickname string, idUsuario string) {
 	for {
 		opcion := mostrarMenuPrincipalYObtenerOpcion()
 
 		switch opcion {
 		case 1:
-			explorarGeneros(clienteCanciones, clienteStreaming, ctx)
+			explorarGeneros(clienteCanciones, clienteStreaming, ctx, idUsuario)
 		case 2:
 			util.VerPreferencias(idUsuario)
 		case 3:
@@ -69,7 +69,7 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 }
 
 // explorarGeneros - Maneja la exploración de géneros musicales
-func explorarGeneros(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context) {
+func explorarGeneros(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, idUsuario string) {
 	fmt.Println("\n📡 Obteniendo lista de géneros disponibles...")
 
 	respuestaGeneros, err := clienteCanciones.ListarGeneros(ctx, &pbSong.Vacio{})
@@ -96,7 +96,7 @@ func explorarGeneros(clienteCanciones pbSong.ServiciosCancionesClient, clienteSt
 			continue // El bucle pedirá otra opción
 		}
 
-		explorarCancionesPorGenero(clienteCanciones, clienteStreaming, ctx, genero)
+		explorarCancionesPorGenero(clienteCanciones, clienteStreaming, ctx, genero, idUsuario)
 	}
 }
 
@@ -147,7 +147,7 @@ func buscarGeneroPorId(generos []*pbSong.Genero, id int32) *pbSong.Genero {
 
 // explorarCancionesPorGenero - Explora las canciones de un género específico
 // explorarCancionesPorGenero - Explora las canciones de un género específico
-func explorarCancionesPorGenero(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, genero *pbSong.Genero) bool {
+func explorarCancionesPorGenero(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, genero *pbSong.Genero, idUsuario string) bool {
 	fmt.Printf("\n📡 Buscando canciones del género '%s'...\n", genero.Nombre)
 
 	respuestaCanciones, err := clienteCanciones.ListarCancionesPorGenero(ctx, &pbSong.IdGenero{Id: genero.Id})
@@ -171,7 +171,7 @@ func explorarCancionesPorGenero(clienteCanciones pbSong.ServiciosCancionesClient
 			return false
 		}
 
-		buscarYReproducirCancion(clienteCanciones, clienteStreaming, ctx, cancionSeleccionada)
+		buscarYReproducirCancion(clienteCanciones, clienteStreaming, ctx, cancionSeleccionada, idUsuario)
 	}
 }
 
@@ -255,8 +255,9 @@ func buscarYReproducirCancion(
 	clienteStreaming pbStream.AudioServiceClient,
 	ctx context.Context,
 	input interface{},
-	canciones ...[]*pbSong.Cancion,
-) {
+	idUsuario string,
+	canciones ...[]*pbSong.Cancion) {
+
 	var cancionSeleccionada *pbSong.Cancion
 
 	switch valor := input.(type) {
@@ -311,7 +312,8 @@ func buscarYReproducirCancion(
 		mostrarDetallesCancion(cancionSeleccionada)
 
 		if confirmarReproduccion() {
-			reproducirCancion(clienteStreaming, ctx, cancionSeleccionada)
+			idCancion := fmt.Sprintf("%d", cancionSeleccionada.Id)
+			reproducirCancion(clienteStreaming, ctx, cancionSeleccionada, idUsuario, idCancion)
 		}
 	} else {
 		fmt.Println("❌ No se encontró ninguna canción con los datos proporcionados.")
@@ -361,7 +363,7 @@ func confirmarReproduccion() bool {
 // 1. Inicia la petición al servidor para enviar la canción.
 // 2. Lanza goroutines para decodificar, reproducir y escuchar teclado.
 // 3. Permite detener la canción con la tecla '1' o esperar a que termine.
-func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context.Context, cancion *pbSong.Cancion) {
+func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context.Context, cancion *pbSong.Cancion, idUsuario string, idCancion string) {
 	fmt.Printf("\n🎵 Iniciando reproducción de '%s'...\n", cancion.Titulo)
 
 	// Contexto con cancelación para detener la transmisión
@@ -408,7 +410,7 @@ func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context
 
 	// Goroutine 3: Recibe los fragmentos de audio desde el servidor
 	go func() {
-		util.RecibirCancion(stream, audioWriter, canalSincronizacion, int(cancion.Id), int(cancion.Id))
+		util.RecibirCancion(stream, audioWriter, canalSincronizacion, idUsuario, idCancion)
 	}()
 
 	// Esperar eventos: interrupción del usuario o finalización de la canción

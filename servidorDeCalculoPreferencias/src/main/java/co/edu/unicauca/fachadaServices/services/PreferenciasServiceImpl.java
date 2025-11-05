@@ -27,20 +27,29 @@ public class PreferenciasServiceImpl implements IPreferenciasService {
 	@Override
 	public PreferenciasDTORespuesta getReferencias(Integer id) {
 		System.out.println("Obteniendo preferencias para el usuario con ID: " + id);
+		
 		List<CancionDTOEntrada> objCanciones = this.comunicacionServidorCanciones.obtenerCancionesRemotas();
 		System.out.println("Canciones obtenidas del servidor de canciones");
 
-		for (CancionDTOEntrada cancion : objCanciones){
-			System.out.println("Cancion obtenida: " + cancion.getTitulo());
-			System.out.println("Genero: " + cancion.getGenero());
-			System.out.println("Artista: " + cancion.getArtista());
-			
+		if (objCanciones == null) {
+			System.out.println(" No se recibieron canciones (objCanciones es NULL)");
+		} else if (objCanciones.isEmpty()) {
+			System.out.println("Lista de canciones vacía");
+		} else {
+			System.out.println("Canciones recibidas:");
+			for (CancionDTOEntrada c : objCanciones) {
+				System.out.println("   ID: " + c.getId() + " | Título: " + c.getTitulo() + 
+								" | Género: " + c.getGenero() + " | Artista: " + c.getArtista());
+			}
 		}
+
 		List<ReproduccionesDTOEntrada> reproduccionesUsuario = this.comunicacionServidorReproducciones.obtenerReproduccionesRemotas(id);
 		System.out.println("Reproducciones obtenidas del servidor de reproducciones para el usuario  " + id);
-		for (ReproduccionesDTOEntrada reproduccion : reproduccionesUsuario){
-			System.out.println(reproduccion.getUserId() + " " + reproduccion.getSongId());
-		}
+		System.out.println("🟦 Llamando a obtenerReproduccionesRemotas con id = " + id);
+		
+		for (ReproduccionesDTOEntrada r : reproduccionesUsuario) {
+        System.out.println("Repro encontrada -> user: " + r.getUserId() + " song: " + r.getSongId());
+    	}
 	
 		return this.calculadorPreferencias.calcular(id, objCanciones, reproduccionesUsuario);
 	}

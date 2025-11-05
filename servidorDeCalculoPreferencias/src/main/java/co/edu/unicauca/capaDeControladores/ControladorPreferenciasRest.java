@@ -17,7 +17,7 @@ public class ControladorPreferenciasRest {
      * Ejemplo: POST http://localhost:2021/preferencias/calcular?idUsuario=1
      */
     @PostMapping("/calcular")
-    public PreferenciasDTORespuesta calcularPreferencias(@RequestParam("idUsuario") int idUsuario) {
+    public PreferenciasDTORespuesta calcularPreferencias(@RequestParam("idUsuario") Integer idUsuario) {
         System.out.println(" Petición REST recibida: calcular preferencias del usuario " + idUsuario);
         return preferenciasService.getReferencias(idUsuario);
     }

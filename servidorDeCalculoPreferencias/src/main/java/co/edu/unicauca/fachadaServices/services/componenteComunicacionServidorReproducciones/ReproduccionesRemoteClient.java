@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface ReproduccionesRemoteClient {
 
-    @RequestLine("GET /reproducciones?idUsuario={idUsuario}")
+   @RequestLine("GET /reproducciones/usuario/{userId}")
     @Headers("Accept: application/json")
 
-    List<ReproduccionesDTOEntrada> obtenerReproducciones(@Param("idUsuario")Integer idUsuario);
+    List<ReproduccionesDTOEntrada> obtenerReproducciones(@Param("userId")Integer idUsuario);
 
 }
 

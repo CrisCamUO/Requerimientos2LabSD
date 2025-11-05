@@ -27,6 +27,7 @@ public class ComunicacionServidorCanciones {
             List<CancionDTOEntrada> canciones = client.obtenerCanciones();
             return canciones != null ? canciones : new ArrayList<>(); 
         } catch (Exception e) {
+            System.out.println("Error consultando canciones: " + e.getMessage());
             return new ArrayList<>();
         }
     }

@@ -3,7 +3,7 @@ package co.edu.unicauca.main;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "co.edu.unicauca")
 public class Main {
 
     public static void main(String[] args) {
