@@ -25,10 +25,16 @@ type PreferenciaArtista struct {
 	NumeroPreferencias int    `json:"numeroPreferencias"`
 }
 
+type PreferenciaIdioma struct {
+	NombreIdioma       string `json:"nombreIdioma"`
+	NumeroPreferencias int    `json:"numeroPreferencias"`
+}
+
 type PreferenciasRespuesta struct {
 	IdUsuario            int                  `json:"idUsuario"`
 	PreferenciasGeneros  []PreferenciaGenero  `json:"preferenciasGeneros"`
 	PreferenciasArtistas []PreferenciaArtista `json:"preferenciasArtistas"`
+	PreferenciasIdiomas  []PreferenciaIdioma  `json:"preferenciasIdiomas"`
 }
 
 func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) {
@@ -61,7 +67,7 @@ func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, wr
 		fmt.Printf("\n Fragmento #%d recibido (%d bytes) reproduciendo...", noFragmento, len(fragmento.Data))
 
 		if _, err := writer.Write(fragmento.Data); err != nil {
-			log.Printf("Error escribiendo en pipe: %v", err)
+			log.Printf("Se detuvo la lectura en pipe: %v", err)
 			break
 		}
 	}
@@ -113,6 +119,12 @@ func VerPreferencias(userID string) {
 		fmt.Println("\n🎤 Artistas preferidos:")
 		for i, a := range prefs.PreferenciasArtistas {
 			fmt.Printf("   %d. %s (%d reproducciones)\n", i+1, a.NombreArtista, a.NumeroPreferencias)
+		}
+	}
+	if len(prefs.PreferenciasIdiomas) > 0 {
+		fmt.Println("\n🗣️ Idiomas preferidos:")
+		for i, id := range prefs.PreferenciasIdiomas {
+			fmt.Printf("   %d. %s (%d reproducciones)\n", i+1, id.NombreIdioma, id.NumeroPreferencias)
 		}
 	}
 

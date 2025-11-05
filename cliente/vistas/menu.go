@@ -8,6 +8,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pbStream "servidor.local/grpc-servidor/serviciosStreaming"
 	pbSong "servidor.local/grpc-servidorCancion/serviciosCancion"
@@ -72,9 +76,18 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 func explorarGeneros(clienteCanciones pbSong.ServiciosCancionesClient, clienteStreaming pbStream.AudioServiceClient, ctx context.Context, idUsuario string) {
 	fmt.Println("\n📡 Obteniendo lista de géneros disponibles...")
 
-	respuestaGeneros, err := clienteCanciones.ListarGeneros(ctx, &pbSong.Vacio{})
+	// Use a short, per-RPC timeout so the UI doesn't hang or depend on the parent context
+	rpcCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	respuestaGeneros, err := clienteCanciones.ListarGeneros(rpcCtx, &pbSong.Vacio{})
 	if err != nil {
-		fmt.Printf("❌ Error obteniendo géneros: %v\n", err)
+		// Give a clearer message for deadline/timeouts vs other errors
+		if status.Code(err) == codes.DeadlineExceeded {
+			fmt.Println("❌ Tiempo de espera excedido al obtener géneros. Verifique que el servidor esté en ejecución y la red.")
+		} else {
+			fmt.Printf("❌ Error obteniendo géneros: %v\n", err)
+		}
 		presionarEnterParaContinuar()
 		return
 	}

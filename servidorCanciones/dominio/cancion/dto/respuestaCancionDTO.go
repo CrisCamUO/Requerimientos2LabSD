@@ -26,5 +26,6 @@ func ToPbCancion(c cancionModelo.Cancion) *pb.Cancion {
 			Id:     c.Genero.Id,
 			Nombre: c.Genero.Nombre,
 		},
+		Idioma: c.Idioma,
 	}
 }

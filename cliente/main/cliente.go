@@ -42,7 +42,7 @@ func main() {
 	clienteStreaming := pbStream.NewAudioServiceClient(connStream)
 
 	// Contexto con timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Minute)
 	defer cancel()
 
 	// Mostrar menu principal

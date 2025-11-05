@@ -3,9 +3,9 @@ package fachadacancionesservices
 import (
 	"fmt"
 
-	capaaccesoadatos "servidor.local/grpc-servidorCancion/dominio/cancion/capaAccesoADatos"
 	componnteconexioncola "servidor.local/grpc-servidorCancion/dominio/cancion/componnteConexionCola"
 	dtos "servidor.local/grpc-servidorCancion/dominio/cancion/dto"
+	capaaccesoadatos "servidor.local/grpc-servidorCancion/dominio/cancion/repositorio"
 )
 
 type FachadaAlmacenamiento struct {

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import co.edu.unicauca.fachadaServices.DTO.CancionDTOEntrada;
 import co.edu.unicauca.fachadaServices.DTO.PreferenciaArtistaDTORespuesta;
 import co.edu.unicauca.fachadaServices.DTO.PreferenciaGeneroDTORespuesta;
+import co.edu.unicauca.fachadaServices.DTO.PreferenciaIdiomaDTORespuesta;
 import co.edu.unicauca.fachadaServices.DTO.PreferenciasDTORespuesta;
 import co.edu.unicauca.fachadaServices.DTO.ReproduccionesDTOEntrada;
 
@@ -29,6 +30,7 @@ public class CalculadorPreferencias {
         // Contadores de generos y artistas
         Map<String, Integer> contadorGeneros = new HashMap<>();
         Map<String, Integer> contadorArtistas = new HashMap<>();
+    Map<String, Integer> contadorIdiomas = new HashMap<>();
 
         System.out.println("Iniciando calculo de preferencias...");
 
@@ -47,9 +49,16 @@ public class CalculadorPreferencias {
 
                 String genero = c.getGenero() == null ? "Desconocido" : c.getGenero();
                 String artista = c.getArtista() == null ? "Desconocido" : c.getArtista();
+                String idioma = "Desconocido";
+                try {
+                    idioma = c.getIdioma() == null ? "Desconocido" : c.getIdioma();
+                } catch (Exception ex) {
+                    idioma = "Desconocido";
+                }
 
                 contadorGeneros.put(genero, contadorGeneros.getOrDefault(genero, 0) + 1);
                 contadorArtistas.put(artista, contadorArtistas.getOrDefault(artista, 0) + 1);
+                contadorIdiomas.put(idioma, contadorIdiomas.getOrDefault(idioma, 0) + 1);
 
                 System.out.println(" Procesada reproducción -> " + artista + " / " + genero);
 
@@ -72,12 +81,19 @@ public class CalculadorPreferencias {
                     .thenComparing(PreferenciaArtistaDTORespuesta::getNombreArtista))
             .collect(Collectors.toList());
 
+    List<PreferenciaIdiomaDTORespuesta> preferenciasIdiomas = contadorIdiomas.entrySet().stream()
+        .map(e -> new PreferenciaIdiomaDTORespuesta(e.getKey(), e.getValue()))
+        .sorted(Comparator.comparingInt(PreferenciaIdiomaDTORespuesta::getNumeroPreferencias).reversed()
+            .thenComparing(PreferenciaIdiomaDTORespuesta::getNombreIdioma))
+        .collect(Collectors.toList());
+
         // Armar el DTO final
 
         PreferenciasDTORespuesta respuesta = new PreferenciasDTORespuesta();
         respuesta.setIdUsuario(idUsuario);
         respuesta.setPreferenciasGeneros(preferenciasGeneros);
         respuesta.setPreferenciasArtistas(preferenciasArtistas);
+    respuesta.setPreferenciasIdiomas(preferenciasIdiomas);
 
         System.out.println(" Cálculo de preferencias completado.");
         return respuesta;

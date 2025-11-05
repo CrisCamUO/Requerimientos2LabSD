@@ -5,21 +5,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 // Estructura que se enviará al microservicio de reproducciones
 type ReproduccionDTO struct {
-	IdUsuario int32 `json:"idUsuario"`
-	IdCancion int32 `json:"idCancion"`
+	UserId string `json:"userId"`
+	SongId string `json:"songId"`
 }
 
 // Envía una reproducción al servidor de reproducciones (Spring Boot)
 func EnviarReproduccion(idUsuario int32, idCancion int32) error {
 	url := "http://localhost:2020/reproducciones"
 
+	// Convertimos los ids a string para que coincidan con los DTOs Java (userId/songId)
 	body, _ := json.Marshal(ReproduccionDTO{
-		IdUsuario: idUsuario,
-		IdCancion: idCancion,
+		UserId: strconv.Itoa(int(idUsuario)),
+		SongId: strconv.Itoa(int(idCancion)),
 	})
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
