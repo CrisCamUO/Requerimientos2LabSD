@@ -2,9 +2,9 @@ package capacontroladores
 
 import (
 	"fmt"
+
 	capafachadaservices "servidor.local/grpc-servidor/capaFachadaServices"
 	pb "servidor.local/grpc-servidor/serviciosStreaming"
-	
 )
 
 type ControladorServidor struct {
@@ -14,11 +14,9 @@ type ControladorServidor struct {
 // Implementación del procedimiento remoto que recibe el título de una canción y envia el archivo de audio en fragmentos mediante un stream.
 func (s *ControladorServidor) EnviarCancionMedianteStream(req *pb.PeticionDTO, stream pb.AudioService_EnviarCancionMedianteStreamServer) error {
 	// Enviar los fragmentos de audio
-	err := capafachadaservices.StreamAudioFile(
-		req.Id,
-		func(data []byte) error {
-			return stream.Send(&pb.FragmentoCancion{Data: data})
-		})
+	err := capafachadaservices.StreamAudioFileByName(req.Nombre, func(data []byte) error {
+		return stream.Send(&pb.FragmentoCancion{Data: data})
+	})
 	if err != nil {
 		fmt.Println("Error al enviar el audio:", err)
 		return err

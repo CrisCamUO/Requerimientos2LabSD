@@ -3,6 +3,7 @@ package fachadacancionesservices
 import (
 	"log"
 
+	repoCanciones "servidor.local/grpc-servidorCancion/dominio/cancion/capaAccesoADatos"
 	dto "servidor.local/grpc-servidorCancion/dominio/cancion/dto"
 	repositorio "servidor.local/grpc-servidorCancion/dominio/cancion/repositorio"
 	fachadagen "servidor.local/grpc-servidorCancion/dominio/genero/fachadaGeneroServices"
@@ -29,7 +30,7 @@ func ListarCancionesPorGenero(idGenero int32) (*pb.ListaCanciones, error) {
 	log.Printf("Ejecutando fachada: ListarCancionesPorGenero con id=%d", idGenero)
 
 	lista := &pb.ListaCanciones{}
-	for _, c := range repositorio.VectorCanciones {
+	for _, c := range repoCanciones.VectorCanciones {
 		if int32(c.Genero.Id) == idGenero {
 			lista.Canciones = append(lista.Canciones, dto.ToPbCancion(c))
 		}
@@ -58,7 +59,7 @@ func BuscarCancion(titulo string) (*pb.RespuestaCancionDTO, error) {
 
 // ObtenerDetalleCancion devuelve los detalles de una canción por ID
 func ObtenerDetalleCancion(id int32) (*pb.DetalleCancion, error) {
-	for _, c := range repositorio.VectorCanciones {
+	for _, c := range repoCanciones.VectorCanciones {
 		if int32(c.Id) == id {
 			return &pb.DetalleCancion{
 				Cancion: dto.ToPbCancion(c), // mapea todos los campos básicos, incluyendo ObjGenero
@@ -72,7 +73,7 @@ func ObtenerDetalleCancion(id int32) (*pb.DetalleCancion, error) {
 func ObtenerCancionesParaREST() []map[string]interface{} {
 	var lista []map[string]interface{}
 
-	for _, c := range repositorio.VectorCanciones {
+	for _, c := range repoCanciones.VectorCanciones {
 		lista = append(lista, map[string]interface{}{
 			"id":              c.Id,
 			"titulo":          c.Titulo,
@@ -80,7 +81,7 @@ func ObtenerCancionesParaREST() []map[string]interface{} {
 			"anioLanzamiento": c.AnioLanzamiento,
 			"duracion":        c.Duracion,
 			"genero":          c.Genero.Nombre,
-			"idioma":		   c.Idioma,
+			"idioma":          c.Idioma,
 		})
 	}
 	return lista

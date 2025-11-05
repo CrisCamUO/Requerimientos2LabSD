@@ -374,6 +374,7 @@ func reproducirCancion(clienteStreaming pbStream.AudioServiceClient, ctx context
 	stream, err := clienteStreaming.EnviarCancionMedianteStream(ctxCancel, &pbStream.PeticionDTO{
 		Id:      cancion.Id,
 		Formato: "mp3",
+		Nombre:  fmt.Sprintf("%s_%s_%s", cancion.Titulo, cancion.ObjGenero.Nombre, cancion.Artista),
 	})
 	if err != nil {
 		fmt.Printf("❌ Error iniciando streaming: %v\n", err)
