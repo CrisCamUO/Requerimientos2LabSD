@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CancionesRemoteClient {
 
-    @RequestLine ("GET /canciones")
+    @RequestLine("GET /canciones/metadatos")
     @Headers("Accept: application/json")
     List<CancionDTOEntrada> obtenerCanciones();
 

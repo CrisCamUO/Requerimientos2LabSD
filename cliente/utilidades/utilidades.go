@@ -15,6 +15,22 @@ import (
 	pb "servidor.local/grpc-servidor/serviciosStreaming"
 )
 
+type PreferenciaGenero struct {
+	NombreGenero       string `json:"nombreGenero"`
+	NumeroPreferencias int    `json:"numeroPreferencias"`
+}
+
+type PreferenciaArtista struct {
+	NombreArtista      string `json:"nombreArtista"`
+	NumeroPreferencias int    `json:"numeroPreferencias"`
+}
+
+type PreferenciasRespuesta struct {
+	IdUsuario            int                  `json:"idUsuario"`
+	PreferenciasGeneros  []PreferenciaGenero  `json:"preferenciasGeneros"`
+	PreferenciasArtistas []PreferenciaArtista `json:"preferenciasArtistas"`
+}
+
 func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) {
 	streamer, format, err := mp3.Decode(io.NopCloser(reader))
 	if err != nil {
@@ -64,13 +80,43 @@ func VerPreferencias(userID string) {
 	url := fmt.Sprintf("http://localhost:2021/preferencias/calcular?idUsuario=%s", userID)
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(nil))
 	if err != nil {
-		fmt.Printf("Error llamando al servidor de preferencias: %v\n", err)
+		fmt.Printf("❌ Error llamando al servidor de preferencias: %v\n", err)
 		return
 	}
 	defer resp.Body.Close()
+
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("\nPreferencias recibidas:")
-	fmt.Println(string(body))
+
+	var prefs PreferenciasRespuesta
+	if err := json.Unmarshal(body, &prefs); err != nil {
+		fmt.Println("⚠️ No se pudo procesar la respuesta del servidor:")
+		fmt.Println(string(body))
+		return
+	}
+
+	fmt.Printf("\n🎧 Preferencias del usuario #%d 🎧\n", prefs.IdUsuario)
+	fmt.Println("───────────────────────────────────────")
+
+	if len(prefs.PreferenciasGeneros) == 0 && len(prefs.PreferenciasArtistas) == 0 {
+		fmt.Println("🚫 No hay suficientes reproducciones para calcular preferencias.")
+		return
+	}
+
+	if len(prefs.PreferenciasGeneros) > 0 {
+		fmt.Println("\n🎵 Géneros preferidos:")
+		for i, g := range prefs.PreferenciasGeneros {
+			fmt.Printf("   %d. %s (%d reproducciones)\n", i+1, g.NombreGenero, g.NumeroPreferencias)
+		}
+	}
+
+	if len(prefs.PreferenciasArtistas) > 0 {
+		fmt.Println("\n🎤 Artistas preferidos:")
+		for i, a := range prefs.PreferenciasArtistas {
+			fmt.Printf("   %d. %s (%d reproducciones)\n", i+1, a.NombreArtista, a.NumeroPreferencias)
+		}
+	}
+
+	fmt.Println("───────────────────────────────────────\n")
 }
 
 func RegistrarReproduccion(idUsuario string, idCancion string) {
@@ -85,13 +131,13 @@ func RegistrarReproduccion(idUsuario string, idCancion string) {
 
 	jsonData, _ := json.Marshal(reproduccion)
 
-    resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-    if err != nil {
-        fmt.Printf("Error enviando reproducción: %v\n", err)
-        return
-    }
-    defer resp.Body.Close()
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Printf("Error enviando reproducción: %v\n", err)
+		return
+	}
+	defer resp.Body.Close()
 
-    body, _ := io.ReadAll(resp.Body)
-    fmt.Println(string(body))
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(body))
 }

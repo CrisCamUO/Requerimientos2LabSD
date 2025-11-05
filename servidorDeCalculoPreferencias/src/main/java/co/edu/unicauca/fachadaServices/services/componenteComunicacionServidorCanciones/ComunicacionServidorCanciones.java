@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ComunicacionServidorCanciones {
 
-  private static final String BASE_URL = "http://localhost:5051";
+  private static final String BASE_URL = "http://localhost:5000";
   private final CancionesRemoteClient client;
 
     public ComunicacionServidorCanciones(){
