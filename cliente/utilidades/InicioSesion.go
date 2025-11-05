@@ -52,7 +52,7 @@ func IniciarSesion() (string, string) {
 	// Validar contra el "almacén" en memoria
 	for _, u := range usuarios {
 		if u.Nickname == nick && u.Password == password {
-			fmt.Printf("✅ Bienvenido %s (id=%d)\n", u.Nickname, u.Id)
+			fmt.Printf("✅ ¡Bienvenido, %s! id %s\n", u.Nickname, u.Id)
 			return u.Nickname, u.Id
 		}
 	}

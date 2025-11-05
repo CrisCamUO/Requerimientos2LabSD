@@ -41,7 +41,7 @@ func (r *RepositorioCanciones) GuardarCancion(titulo string, genero string, arti
 	objCancion.Id = 0
 	objCancion.Titulo = titulo
 	objCancion.Genero = repoGenero.BuscarGeneroNombre(genero).ObjGenero
-	objCancion.Autor = artista
+	objCancion.Artista = artista
 	objCancion.Idioma = idioma
 	objCancion.AnioLanzamiento = anioLanzamiento
 	objCancion.Duracion = duracion

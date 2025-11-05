@@ -19,7 +19,7 @@ func ToPbCancion(c cancionModelo.Cancion) *pb.Cancion {
 	return &pb.Cancion{
 		Id:              c.Id,
 		Titulo:          c.Titulo,
-		Artista:         c.Autor,
+		Artista:         c.Artista,
 		AnioLanzamiento: c.AnioLanzamiento,
 		Duracion:        c.Duracion,
 		ObjGenero: &pb.Genero{

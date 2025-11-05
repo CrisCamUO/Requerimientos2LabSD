@@ -76,7 +76,7 @@ func ObtenerCancionesParaREST() []map[string]interface{} {
 		lista = append(lista, map[string]interface{}{
 			"id":              c.Id,
 			"titulo":          c.Titulo,
-			"autor":           c.Autor,
+			"artista":         c.Artista,
 			"anioLanzamiento": c.AnioLanzamiento,
 			"duracion":        c.Duracion,
 			"genero":          c.Genero.Nombre,

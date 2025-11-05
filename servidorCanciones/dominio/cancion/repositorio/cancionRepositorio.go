@@ -19,7 +19,7 @@ func CargarCanciones() {
 	objCancion1.Id = nextID
 	nextID++
 	objCancion1.Titulo = "La Vida"
-	objCancion1.Autor = "Carlos Vives"
+	objCancion1.Artista = "Carlos Vives"
 	objCancion1.Duracion = "3:45"
 	objCancion1.AnioLanzamiento = 1998
 	objCancion1.Genero = repoGenero.VectorGeneros[0] // Asignar el género Salsa
@@ -27,7 +27,7 @@ func CargarCanciones() {
 	objCancion2.Id = nextID
 	nextID++
 	objCancion2.Titulo = "La Bicicleta"
-	objCancion2.Autor = "Shakira"
+	objCancion2.Artista = "Shakira"
 	objCancion2.Duracion = "3:38"
 	objCancion2.AnioLanzamiento = 2016
 	objCancion2.Genero = repoGenero.VectorGeneros[1] // Asignar el género Cumbia
@@ -35,7 +35,7 @@ func CargarCanciones() {
 	objCancion3.Id = nextID
 	nextID++
 	objCancion3.Titulo = "Ojos Así"
-	objCancion3.Autor = "Shakira"
+	objCancion3.Artista = "Shakira"
 	objCancion3.Duracion = "4:12"
 	objCancion3.AnioLanzamiento = 2000
 	objCancion3.Genero = repoGenero.VectorGeneros[2] // Asignar el género Rock

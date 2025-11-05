@@ -5,11 +5,11 @@ import (
 )
 
 type Cancion struct {
-	Id             int32
-	Titulo         string
-	Autor          string
+	Id              int32
+	Titulo          string
+	Artista         string
 	AnioLanzamiento int32
-	Duracion       string
-	Genero         modelo.Genero
-	Idioma		   string
+	Duracion        string
+	Genero          modelo.Genero
+	Idioma          string
 }
