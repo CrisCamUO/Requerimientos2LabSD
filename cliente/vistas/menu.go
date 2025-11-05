@@ -32,6 +32,17 @@ func MostrarMenuPrincipal(clienteCanciones pbSong.ServiciosCancionesClient, clie
 		case 2:
 			util.VerPreferencias(idUsuario)
 		case 3:
+			// Cerrar sesión e iniciar sesión con otro usuario
+			fmt.Println("\n🔒 Cerrar sesión - Iniciar sesión con otro usuario")
+			newNick, newId := util.IniciarSesion()
+			if newNick == "" || newId == "" {
+				fmt.Println("❌ No se pudo iniciar sesión con otro usuario. Se mantiene la sesión actual.")
+			} else {
+				nickname = newNick
+				idUsuario = newId
+				fmt.Printf("✅ Sesión iniciada como %s (id %s)\n", nickname, idUsuario)
+			}
+		case 4:
 			fmt.Println("\n🎵 ¡Gracias por usar nuestro reproductor de música! ¡Hasta luego! 🎵")
 			return
 		default:
@@ -48,8 +59,9 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 		fmt.Println(strings.Repeat("=", 50))
 		fmt.Println("1. 🎸 Explorar géneros musicales")
 		fmt.Println("2. 📊 Ver recomendaciones de preferencias")
-		fmt.Println("3. 🚪 Salir")
-		fmt.Print("\n📝 Seleccione una opción (1-3): ")
+		fmt.Println("3. 🔐 Cerrar sesión e iniciar sesión con otro usuario")
+		fmt.Println("4. 🚪 Salir")
+		fmt.Print("\n📝 Seleccione una opción (1-4): ")
 
 		input, err := reader.ReadString('\n')
 		if err != nil {
@@ -64,7 +76,7 @@ func mostrarMenuPrincipalYObtenerOpcion() int {
 			continue
 		}
 
-		if opcion >= 1 && opcion <= 3 {
+		if opcion >= 1 && opcion <= 4 {
 			return opcion
 		}
 
